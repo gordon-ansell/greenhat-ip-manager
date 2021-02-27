@@ -1,0 +1,36 @@
+{
+	"name": "greenhat-ip-manager",
+	"version": "0.1.0",
+	"description": "GreenHat IP Manager",
+	"homepage": "https://gordonansell.com/ip-manager",
+	"license": "MIT",
+	"minimum-stability": "dev",
+	"main": "./src/index.js",
+	"repository": {
+		"type": "git",
+		"url": "git+https://github.com/gordon-ansell/ip-manager"
+	},
+	"authors": [
+		{
+			"name": "Gordon Ansell",
+			"email": "contact@gordonansell.com",
+			"url": "https://gordonansell.com"
+		}
+	],
+	"files": [
+		"index.js"
+	],
+	"bin": "./index.js",
+	"dependencies": {
+		"basic-ftp": "*",
+		"deasync": "*",
+		"got": "*",
+		"greenhat-util": "*",
+		"ip-subnet-calculator": "*",
+		"minimist": "*",
+		"striptags": "*"
+	},
+	"engines": {
+		"node": "*"
+	}
+}
