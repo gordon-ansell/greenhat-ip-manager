@@ -216,6 +216,9 @@ class IPManage
         let final = '';
 
         for (let item of this.blocks.items) {
+            if (item.status) {
+                continue;
+            }
             let line = '';
             if (item.ports) {
                 if (!this.cfg.ports[item.ports]) {
