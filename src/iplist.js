@@ -508,6 +508,9 @@ class IPList
         if (item.org) {
             line += `, ${item.org}`;
         }
+        if (item.reason) {
+            line += `, ${item.reason}`;
+        }
         if (item.days) {
             line += `, ${item.days} days`;
         }

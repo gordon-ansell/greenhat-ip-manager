@@ -91,8 +91,8 @@ class IPManage
             case 'reasons':
                 await this.doReasons();
                 break;
-            case 'printcfs':
-                await this.doPrintCfs();
+            case 'printcsf':
+                await this.doPrintCsf();
                 break;
             case 'ftp':
                 await this.doFtp();
@@ -100,6 +100,8 @@ class IPManage
             case 'test':
                 await this.doTest();
                 break;
+            default:
+                syslog.error("Invalid command.");
         }
 
         syslog.notice('='.repeat(50));
@@ -179,7 +181,7 @@ class IPManage
     /**
      * Print for CFS firewall.
      */
-    async doPrintCfs()
+    async doPrintCsf()
     {
         let fp = null;
         if (this.args['_'][3]) {
