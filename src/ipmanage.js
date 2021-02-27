@@ -100,6 +100,9 @@ class IPManage
             case 'test':
                 await this.doTest();
                 break;
+            case 'help':
+                await this.doHelp();
+                break;
             default:
                 syslog.error("Invalid command.");
         }
@@ -109,6 +112,28 @@ class IPManage
 
         return 0;
 
+    }
+
+    /**
+     * Help.
+     */
+    async doHelp()
+    {
+        if (this.args['_'][3]) {
+
+        } else {
+            console.log(`lookup [ip]`);
+            console.log(`block [ip] {-p ports} {-d days} {-r reasonid|reason} {-x reasonextra}`);
+            console.log(`unblock [ip] {-p ports}`);
+            console.log(`blocklist`);
+            console.log(`blocklistexpired`);
+            console.log(`expire`);
+            console.log(`findip [ip mask]`);
+            console.log(`findcountry [country-code]`);
+            console.log(`reasons`);
+            console.log(`printcsf {file-name}`);
+            console.log(`ftp`);
+        }
     }
 
     /**
