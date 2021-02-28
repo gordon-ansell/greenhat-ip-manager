@@ -315,6 +315,30 @@ class IPList
         if (ports != null) {
             item.ports = ports;
         }
+
+        let pReason = -1;
+        if (item.ports) {
+            if (!this.cfg.ports[item.ports]) {
+                syslog.error(`No ports definition found for '${item.ports}'.`);
+                return;
+            } else if (this.cfg.ports[item.ports].reason) {
+                pReason = this.cfg.ports[item.ports].reason;
+            }
+        }
+
+        if (!extra) {
+            extra = [];
+        }
+
+        if (pReason != -1 && !extra.reason) {
+            if (!this.cfg.reasons[pReason])  {
+                syslog.error(`No reason with index ${pReason} (reason derived from ports).`);
+                return;
+            } else {
+                extra.reason = this.cfg.reasons[pReason];
+            }
+        }
+
         if (extra) {
             for (let k of Object.keys(extra)) {
                 if (extra[k] && extra[k] != null) {
@@ -473,6 +497,8 @@ class IPList
 
         console.log('-'.repeat(30));
 
+        this.sortByIP();
+
         for (let item of this.items) {
             if (status != -1 && item.status && item.status != status) {
                 count++;
@@ -489,6 +515,19 @@ class IPList
     }
 
     /**
+     * Pad a string.
+     */
+    _pad(pad, str, padLeft) {
+        if (typeof str === 'undefined') 
+            return pad;
+        if (padLeft) {
+            return (pad + str).slice(-pad.length);
+        } else {
+            return (str + pad).substring(0, pad.length);
+        }
+    }
+
+    /**
      * Format a list item.
      * 
      * @param   {object}    item    List item.
@@ -501,6 +540,10 @@ class IPList
         if (item.ports) {
             line += ` (${item.ports})`;
         }
+
+        let padding = Array(30).join(' ')
+        line = this._pad(padding, line, false);
+
         line += ` # ${item.dtAdded}`;
         if (item.country) {
             line += `, ${item.country}`;
@@ -514,6 +557,18 @@ class IPList
         if (item.days) {
             line += `, ${item.days} days`;
         }
+
+        if (!item.dtExpired) {
+            let blockDays = this.getBlockDays(item);
+
+            line += ` / ${blockDays} days`;
+
+            let expires = new Date(item.dtAdded);
+            expires.setMilliseconds(expires.getMilliseconds() + (blockDays * 86400000));
+
+            line += ` (${expires.toISOString()})`;
+        }
+
         if (item.dtExpired) {
             line += `, EXPIRED: ${item.dtExpired}`
         }
@@ -540,8 +595,19 @@ class IPList
      */
     _sortIPCompare(a, b)
     {
-        const num1 = Number(a.ip.split(".").map((num) => (`000${num}`).slice(-3) ).join(""));
-        const num2 = Number(b.ip.split(".").map((num) => (`000${num}`).slice(-3) ).join(""));
+        let ip1 = a.ip;
+        if (ip1.indexOf('/') != -1) {
+            let sp = ip1.split('/');
+            ip1 = sp[0];
+        }
+        let ip2 = b.ip;
+        if (ip2.indexOf('/') != -1) {
+            let sp = ip2.split('/');
+            ip2 = sp[0];
+        }
+
+        const num1 = Number(ip1.split(".").map((num) => (`000${num}`).slice(-3) ).join(""));
+        const num2 = Number(ip2.split(".").map((num) => (`000${num}`).slice(-3) ).join(""));
         return num1 - num2;
     }
 

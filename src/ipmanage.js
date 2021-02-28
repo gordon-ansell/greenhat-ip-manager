@@ -97,7 +97,13 @@ class IPManage
             case 'ftp':
                 await this.doFtp();
                 break;
-            case 'test':
+            case 'rcsf':
+                await this.doRcsf();
+                break;
+            case 'rcsfp':
+                await this.doRcsf(true);
+                break;
+                case 'test':
                 await this.doTest();
                 break;
             case 'help':
@@ -131,8 +137,46 @@ class IPManage
             console.log(`findip [ip mask]`);
             console.log(`findcountry [country-code]`);
             console.log(`reasons`);
-            console.log(`printcsf {file-name}`);
+            console.log(`printcsf`);
             console.log(`ftp`);
+            console.log(`rcsf`);
+        }
+    }
+
+    /**
+     * Restart CSF and LFD.
+     */
+    async doRcsf(askpass = false)
+    {
+        const { exec } = require("child_process");
+
+        if (this.cfg.sudopw && !askpass) {
+
+            exec('echo "' + this.cfg.sudopw + '" | sudo -S csf -ra', (error, stdout, stderr) => {
+                if (error) {
+                    syslog.error(`error: ${error.message}`);
+                    return;
+                }
+                if (stderr) {
+                    syslog.error(`stderr: ${stderr}`);
+                    return;
+                }
+                console.log(`stdout: ${stdout}`);
+            });
+
+        } else {
+
+            exec("sudo csf -ra", (error, stdout, stderr) => {
+                if (error) {
+                    syslog.error(`error: ${error.message}`);
+                    return;
+                }
+                if (stderr) {
+                    syslog.error(`stderr: ${stderr}`);
+                    return;
+                }
+                console.log(`stdout: ${stdout}`);
+            });
         }
     }
 
@@ -208,12 +252,9 @@ class IPManage
      */
     async doPrintCsf()
     {
-        let fp = null;
-        if (this.args['_'][3]) {
-            fp = path.join(this.dataPath, this.args['_'][3]);
-        }
-
         let final = '';
+
+        this.blocks.sortByIP();
 
         for (let item of this.blocks.items) {
             if (item.status) {
@@ -273,13 +314,12 @@ class IPManage
         }
 
         console.log(final);
-        if (fp) {
-            try {
-                fs.writeFileSync(fp, final);
-                syslog.notice(`Successfully wrote IP list to: ${fp}.`)
-            } catch (err) {
-                syslog.error(`Failed to write to '${fp}':  ${err.message}`);
-            }
+        try {
+            let fp = path.join(this.dataPath, this.cfg.ftp.source);
+            fs.writeFileSync(fp, final);
+            syslog.notice(`Successfully wrote IP list to: ${fp}.`)
+        } catch (err) {
+            syslog.error(`Failed to write to '${fp}':  ${err.message}`);
         }
     }
 
