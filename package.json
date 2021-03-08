@@ -5,7 +5,7 @@
 	"homepage": "https://gordonansell.com/ip-manager",
 	"license": "MIT",
 	"minimum-stability": "dev",
-	"main": "./src/index.js",
+	"main": "./index.js",
 	"repository": {
 		"type": "git",
 		"url": "git+https://github.com/gordon-ansell/ip-manager"

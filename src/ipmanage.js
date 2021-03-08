@@ -103,7 +103,10 @@ class IPManage
             case 'rcsfp':
                 await this.doRcsf(true);
                 break;
-                case 'test':
+            case 'refresh':
+                await this.doRefresh();
+                break;
+            case 'test':
                 await this.doTest();
                 break;
             case 'help':
@@ -140,7 +143,18 @@ class IPManage
             console.log(`printcsf`);
             console.log(`ftp`);
             console.log(`rcsf`);
+            console.log(`refresh`);
         }
+    }
+
+    /**
+     * Do a refresh.
+     */
+    async doRefresh()
+    {
+        await this.doPrintCsf();
+        await this.doFtp();
+        await this.doRcsf();
     }
 
     /**
@@ -158,6 +172,11 @@ class IPManage
                     return;
                 }
                 if (stderr) {
+                    if (stderr.startsWith('[sudo] password')) {
+                        console.log("HERE");
+                        this.doRcsf(true);
+                        return;
+                    }
                     syslog.error(`stderr: ${stderr}`);
                     return;
                 }
