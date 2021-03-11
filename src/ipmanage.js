@@ -173,7 +173,6 @@ class IPManage
                 }
                 if (stderr) {
                     if (stderr.startsWith('[sudo] password')) {
-                        console.log("HERE");
                         this.doRcsf(true);
                         return;
                     }
